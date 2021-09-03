@@ -12,6 +12,9 @@ from .base import InvalidReference
 logger = logging.getLogger(__name__)
 
 
+item_classes = None
+
+
 re_url = re.compile(r'https?://[a-zA-Z0-9$=?_@.&+!*(),%/:-]+')
 
 
@@ -35,25 +38,9 @@ def check(items):
     return changed
 
 
-def extract(files):
+def extract(stored_items, files):
     """Find references in source code, update `depoverflow.toml`.
     """
-    # Load known item types from entrypoints
-    item_classes = load_item_classes()
-
-    # Load items from status file
-    try:
-        with open('depoverflow.status') as fp:
-            status = toml.load(fp)
-    except FileNotFoundError:
-        status = {'items': []}
-    stored_items = set()
-    for obj in status['items']:
-        type_ = obj.pop('type')
-        class_ = item_classes[type_]
-        stored_items.add(class_.from_json(obj))
-    logger.info("Loaded %d items from status file", len(stored_items))
-
     # Find URLs
     urls = set()
     # Loop on files
@@ -95,23 +82,16 @@ def extract(files):
             stored_items.add(item)
             changed = True
 
-    # Save status file
-    logger.info("Saving %d items to status file", len(stored_items))
-    stored_items_json = [
-        OrderedDict(sorted(dict(item.to_json(), type=item.TYPE).items()))
-        for item in sorted(
-            stored_items,
-            key=lambda i: (i.TYPE, i.url()),
-        )
-    ]
-    with open('depoverflow.status', 'w') as fp:
-        toml.dump({'items': stored_items_json}, fp)
-
     return stored_items, changed
 
 
 def main():
+    global item_classes
+
     logging.basicConfig(level=logging.INFO)
+
+    # Load known item types from entrypoints
+    item_classes = load_item_classes()
 
     # Load config
     try:
@@ -121,14 +101,39 @@ def main():
         logger.critical("No config file")
         sys.exit(1)
 
+    # Load items from status file
+    try:
+        with open('depoverflow.status') as fp:
+            status = toml.load(fp)
+    except FileNotFoundError:
+        status = {'items': []}
+    items = set()
+    for obj in status['items']:
+        type_ = obj.pop('type')
+        class_ = item_classes[type_]
+        items.add(class_.from_json(obj))
+    logger.info("Loaded %d items from status file", len(items))
+
     # Update status from source files
     source_files = set()
     for pattern in config['sources']:
         source_files.update(pathlib.Path('.').glob(pattern))
-    items, source_changed = extract(source_files)
+    items, source_changed = extract(items, source_files)
 
     # Check items online
     items_changed = check(items)
+
+    # Save status file
+    logger.info("Saving %d items to status file", len(items))
+    items_json = [
+        OrderedDict(sorted(dict(item.to_json(), type=item.TYPE).items()))
+        for item in sorted(
+            items,
+            key=lambda i: (i.TYPE, i.url()),
+        )
+    ]
+    with open('depoverflow.status', 'w') as fp:
+        toml.dump({'items': items_json}, fp)
 
     # Warn of changes
     if source_changed or items_changed:
