@@ -30,7 +30,22 @@ re_answer = re.compile(
 )
 
 
-class StackExchangeQuestion(Item):
+class StackExchangeBase(Item):
+    """A StackOverflow question or answer.
+    """
+    def __init__(self, site, id):
+        self.site = site
+        self.id = id
+
+    def __eq__(self, other):
+        return (
+            self.TYPE == other.TYPE
+            and self.site == other.site
+            and self.id == other.id
+        )
+
+
+class StackExchangeQuestion(StackExchangeBase):
     """A stackexchange question, that can be watched for new answers.
     """
     TYPE = 'StackExchange Question'
@@ -47,22 +62,11 @@ class StackExchangeQuestion(Item):
         id = int(id)
         return cls(site, id)
 
-    def __init__(self, site, id):
-        self.site = site
-        self.id = id
-
     def url(self):
         return 'https://{site}/q/{id}'.format(site=self.site, id=self.id)
 
-    def __eq__(self, other):
-        return (
-            self.TYPE == other.TYPE
-            and self.site == other.site
-            and self.id == other.id
-        )
 
-
-class StackExchangeAnswer(Item):
+class StackExchangeAnswer(StackExchangeBase):
     """A stackexchange answer, that can be watched for edits and comments.
     """
     TYPE = 'StackExchange Answer'
@@ -79,16 +83,5 @@ class StackExchangeAnswer(Item):
         id = int(id)
         return cls(site, id)
 
-    def __init__(self, site, id):
-        self.site = site
-        self.id = id
-
     def url(self):
         return 'https://{site}/a/{id}'.format(site=self.site, id=self.id)
-
-    def __eq__(self, other):
-        return (
-            self.TYPE == other.TYPE
-            and self.site == other.site
-            and self.id == other.id
-        )
