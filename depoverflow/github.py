@@ -1,4 +1,5 @@
 import re
+import requests
 
 from .base import Item, InvalidReference
 
@@ -18,6 +19,7 @@ class GithubBase(Item):
     def __init__(self, repo, number):
         self.repo = repo
         self.number = number
+        self.updated_date = None
 
     def __eq__(self, other):
         return (
@@ -31,16 +33,35 @@ class GithubBase(Item):
             (self.TYPE, self.repo, self.number),
         )
 
+    def refresh(self):
+        changed = False
+
+        req = requests.get(
+            'https://api.github.com/repos/{repo}/issues/{number}'.format(
+                repo=self.repo,
+                number=self.number,
+            ),
+        )
+        req.raise_for_status()
+        updated_date = req.json()['updated_at']
+        if self.updated_date != updated_date:
+            self.updated_date = updated_date
+            changed = True
+
+        return changed
+
     @classmethod
     def from_json(cls, obj):
-        assert obj.keys() <= {'repo', 'number'}
+        assert obj.keys() <= {'repo', 'number', 'updated_date'}
         item = cls(obj['repo'], obj['number'])
+        item.updated_date = obj.get('updated_date')
         return item
 
     def to_json(self):
         return {
             'repo': self.repo,
             'number': self.number,
+            'updated_date': self.updated_date,
         }
 
 
@@ -69,9 +90,6 @@ class GithubIssue(GithubBase):
             number=self.number,
         )
 
-    def refresh(self):
-        TODO
-
 
 class GithubPullRequest(GithubBase):
     """A GitHub PR, that can be watched for comments and status changes.
@@ -97,6 +115,3 @@ class GithubPullRequest(GithubBase):
             repo=self.repo,
             number=self.number,
         )
-
-    def refresh(self):
-        TODO
