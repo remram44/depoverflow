@@ -3,6 +3,7 @@ import unittest
 from depoverflow.github import GithubIssue, GithubPullRequest
 from depoverflow.stackexchange import StackExchangeQuestion, \
     StackExchangeAnswer
+from depoverflow.utils import batch
 
 
 class TestReferences(unittest.TestCase):
@@ -87,6 +88,18 @@ class TestReferences(unittest.TestCase):
         self.assertEqual(
             (answer.TYPE, answer.site, answer.id),
             ('stackexchange-answer', 'stackoverflow.com', 13445719),
+        )
+
+
+class TestUtils(unittest.TestCase):
+    def test_batch(self):
+        self.assertEqual(
+            list(batch([1, 2, 3, 4, 5, 6, 7], 3)),
+            [[1, 2, 3], [4, 5, 6], [7]],
+        )
+        self.assertEqual(
+            list(batch([1, 2, 3, 4, 5, 6], 3)),
+            [[1, 2, 3], [4, 5, 6]],
         )
 
 

@@ -23,6 +23,9 @@ class Item(object):
     def url(self):
         raise NotImplementedError
 
+    def refresh(self):
+        raise NotImplementedError
+
     @classmethod
     def from_json(cls, obj):
         raise NotImplementedError

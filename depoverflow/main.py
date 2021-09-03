@@ -1,3 +1,4 @@
+import asyncio
 from collections import OrderedDict
 import logging
 import pathlib
@@ -6,7 +7,7 @@ import re
 import sys
 import toml
 
-from .base import InvalidReference
+from .base import InvalidReference, batching
 
 
 logger = logging.getLogger(__name__)
@@ -28,12 +29,31 @@ def load_item_classes():
     return classes
 
 
-def check(items):
+async def check(items):
     """Check whether referenced items have changed.
     """
-    # TODO
-
     changed = False
+    futures = []
+
+    for item in items:
+        ret = item.refresh()
+        if asyncio.isfuture(ret):
+            futures.append((item, ret))
+        elif ret is True:
+            changed = True
+            logger.warning("Item has changed: %s", item.url())
+        elif ret is not False:
+            raise AssertionError("Returned value is not True or False")
+
+    batching.flush()
+
+    for item, future in futures:
+        ret = await future
+        if ret is True:
+            changed = True
+            logger.warning("Item has changed: %s", item.url())
+        elif ret is not False:
+            raise AssertionError("Returned value is not True or False")
 
     return changed
 
@@ -121,7 +141,8 @@ def main():
     items, source_changed = extract(items, source_files)
 
     # Check items online
-    items_changed = check(items)
+    loop = asyncio.get_event_loop()
+    items_changed = loop.run_until_complete(check(items))
 
     # Save status file
     logger.info("Saving %d items to status file", len(items))

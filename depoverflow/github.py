@@ -69,6 +69,9 @@ class GithubIssue(GithubBase):
             number=self.number,
         )
 
+    def refresh(self):
+        TODO
+
 
 class GithubPullRequest(GithubBase):
     """A GitHub PR, that can be watched for comments and status changes.
@@ -94,3 +97,6 @@ class GithubPullRequest(GithubBase):
             repo=self.repo,
             number=self.number,
         )
+
+    def refresh(self):
+        TODO
