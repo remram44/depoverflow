@@ -2,8 +2,16 @@
 name = "depoverflow"
 version = "0.1.0"
 description = "Watches StackOverflow answers and GitHub issues referenced in code for changes"
-authors = ["Remi Rampin <remi@rampin.org>"]
+
 license = "MIT"
+
+authors = [
+    "Remi Rampin <remi@rampin.org>",
+]
+
+readme = "README.md"
+
+repository = "https://github.com/remram44/depoverflow"
 
 [tool.poetry.plugins."depoverflow.items"]
 "stackexchange-question" = "depoverflow.stackexchange:StackExchangeQuestion"
