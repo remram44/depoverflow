@@ -1,6 +1,6 @@
 import re
 
-from .base import Item
+from .base import Item, InvalidReference
 
 
 SITES = {
@@ -63,6 +63,8 @@ class StackExchangeQuestion(StackExchangeBase):
     @classmethod
     def create(cls, url):
         m = re_question.match(url)
+        if m is None:
+            raise InvalidReference
         site, id = m.groups()
         id = int(id)
         return cls(site, id)
@@ -84,6 +86,8 @@ class StackExchangeAnswer(StackExchangeBase):
     @classmethod
     def create(cls, url):
         m = re_answer.match(url)
+        if m is None:
+            raise InvalidReference
         site, id = m.groups()
         id = int(id)
         return cls(site, id)

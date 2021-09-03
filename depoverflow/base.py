@@ -1,5 +1,9 @@
-class InvalidItem(ValueError):
+class InvalidJSONItem(ValueError):
     """Item is not correctly configured in JSON."""
+
+
+class InvalidReference(ValueError):
+    """URL is not this kind of reference."""
 
 
 class Item(object):

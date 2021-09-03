@@ -1,6 +1,6 @@
 import re
 
-from .base import Item
+from .base import Item, InvalidReference
 
 
 re_issue = re.compile(
@@ -45,6 +45,8 @@ class GithubIssue(GithubBase):
     @classmethod
     def create(cls, url):
         m = re_issue.match(url)
+        if m is None:
+            raise InvalidReference
         repo, number = m.groups()
         number = int(number)
         return cls(repo, number)
@@ -69,6 +71,8 @@ class GithubPullRequest(GithubBase):
     @classmethod
     def create(cls, url):
         m = re_pull_request.match(url)
+        if m is None:
+            raise InvalidReference
         repo, number = m.groups()
         number = int(number)
         return cls(repo, number)
