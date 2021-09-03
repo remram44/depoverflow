@@ -26,6 +26,11 @@ class GithubBase(Item):
             and self.number == other.number
         )
 
+    def __hash__(self):
+        return hash(
+            (self.TYPE, self.repo, self.number),
+        )
+
 
 class GithubIssue(GithubBase):
     """A GitHub issue, that can be watched for comments and status changes.

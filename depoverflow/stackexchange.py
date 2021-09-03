@@ -44,6 +44,11 @@ class StackExchangeBase(Item):
             and self.id == other.id
         )
 
+    def __hash__(self):
+        return hash(
+            (self.TYPE, self.site, self.id),
+        )
+
 
 class StackExchangeQuestion(StackExchangeBase):
     """A stackexchange question, that can be watched for new answers.
