@@ -22,7 +22,7 @@ class TestReferences(unittest.TestCase):
         )
         self.assertEqual(
             (issue.TYPE, issue.repo, issue.number),
-            ('GitHub Issue', 'remram44/depoverflow', 1),
+            ('github-issue', 'remram44/depoverflow', 1),
         )
 
     def test_github_pr(self):
@@ -41,7 +41,7 @@ class TestReferences(unittest.TestCase):
         )
         self.assertEqual(
             (issue.TYPE, issue.repo, issue.number),
-            ('GitHub Pull Request', 'remram44/depoverflow', 21),
+            ('github-pr', 'remram44/depoverflow', 21),
         )
 
     def test_stackexchange_question(self):
@@ -67,7 +67,7 @@ class TestReferences(unittest.TestCase):
         )
         self.assertEqual(
             (question.TYPE, question.site, question.id),
-            ('StackExchange Question', 'stackoverflow.com', 44990227),
+            ('stackexchange-question', 'stackoverflow.com', 44990227),
         )
 
     def test_stackexchange_answer(self):
@@ -86,7 +86,7 @@ class TestReferences(unittest.TestCase):
         )
         self.assertEqual(
             (answer.TYPE, answer.site, answer.id),
-            ('StackExchange Answer', 'stackoverflow.com', 13445719),
+            ('stackexchange-answer', 'stackoverflow.com', 13445719),
         )
 
 

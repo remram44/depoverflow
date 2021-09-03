@@ -31,11 +31,23 @@ class GithubBase(Item):
             (self.TYPE, self.repo, self.number),
         )
 
+    @classmethod
+    def from_json(cls, obj):
+        assert obj.keys() <= {'repo', 'number'}
+        item = cls(obj['repo'], obj['number'])
+        return item
+
+    def to_json(self):
+        return {
+            'repo': self.repo,
+            'number': self.number,
+        }
+
 
 class GithubIssue(GithubBase):
     """A GitHub issue, that can be watched for comments and status changes.
     """
-    TYPE = 'GitHub Issue'
+    TYPE = 'github-issue'
 
     @classmethod
     def is_url_reference(cls, url):
@@ -61,7 +73,7 @@ class GithubIssue(GithubBase):
 class GithubPullRequest(GithubBase):
     """A GitHub PR, that can be watched for comments and status changes.
     """
-    TYPE = 'GitHub Pull Request'
+    TYPE = 'github-pr'
 
     @classmethod
     def is_url_reference(cls, url):

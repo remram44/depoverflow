@@ -5,8 +5,18 @@ description = "Watches StackOverflow answers and GitHub issues referenced in cod
 authors = ["Remi Rampin <remi@rampin.org>"]
 license = "MIT"
 
+[tool.poetry.plugins."depoverflow.items"]
+"stackexchange-question" = "depoverflow.stackexchange:StackExchangeQuestion"
+"stackexchange-answer" = "depoverflow.stackexchange:StackExchangeAnswer"
+"github-issue" = "depoverflow.github:GithubIssue"
+"github-pr" = "depoverflow.github:GithubPullRequest"
+
+[tool.poetry.scripts]
+depoverflow = "depoverflow.main:main"
+
 [tool.poetry.dependencies]
 python = "^3.7"
+toml = ">=0.10,<0.11"
 
 [tool.poetry.dev-dependencies]
 

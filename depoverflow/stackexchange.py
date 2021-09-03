@@ -53,7 +53,7 @@ class StackExchangeBase(Item):
 class StackExchangeQuestion(StackExchangeBase):
     """A stackexchange question, that can be watched for new answers.
     """
-    TYPE = 'StackExchange Question'
+    TYPE = 'stackexchange-question'
 
     @classmethod
     def is_url_reference(cls, url):
@@ -72,11 +72,23 @@ class StackExchangeQuestion(StackExchangeBase):
     def url(self):
         return 'https://{site}/q/{id}'.format(site=self.site, id=self.id)
 
+    @classmethod
+    def from_json(cls, obj):
+        assert obj.keys() <= {'site', 'id'}
+        item = cls(obj['site'], obj['id'])
+        return item
+
+    def to_json(self):
+        return {
+            'site': self.site,
+            'id': self.id,
+        }
+
 
 class StackExchangeAnswer(StackExchangeBase):
     """A stackexchange answer, that can be watched for edits and comments.
     """
-    TYPE = 'StackExchange Answer'
+    TYPE = 'stackexchange-answer'
 
     @classmethod
     def is_url_reference(cls, url):
@@ -94,3 +106,15 @@ class StackExchangeAnswer(StackExchangeBase):
 
     def url(self):
         return 'https://{site}/a/{id}'.format(site=self.site, id=self.id)
+
+    @classmethod
+    def from_json(cls, obj):
+        assert obj.keys() <= {'site', 'id'}
+        item = cls(obj['site'], obj['id'])
+        return item
+
+    def to_json(self):
+        return {
+            'site': self.site,
+            'id': self.id,
+        }
