@@ -137,7 +137,15 @@ def main():
     # Update status from source files
     source_files = set()
     for pattern in config['sources']:
-        source_files.update(pathlib.Path('.').glob(pattern))
+        matches = pathlib.Path('.').glob(pattern)
+        for match in matches:
+            if match.is_dir():
+                for path in match.glob('**'):
+                    if path.is_file():
+                        source_files.add(path)
+            elif match.is_file():
+                source_files.add(match)
+    logger.info("Reading %d files", len(source_files))
     items, source_changed = extract(items, source_files)
 
     # Check items online
