@@ -138,13 +138,17 @@ def main():
     source_files = set()
     for pattern in config['sources']:
         matches = pathlib.Path('.').glob(pattern)
+        did_match = False
         for match in matches:
+            did_match = True
             if match.is_dir():
                 for path in match.glob('**'):
                     if path.is_file():
                         source_files.add(path)
             elif match.is_file():
                 source_files.add(match)
+        if not did_match:
+            logger.warning("Source doesn't match anything: %s", pattern)
     logger.info("Reading %d files", len(source_files))
     items, source_changed = extract(items, source_files)
 
