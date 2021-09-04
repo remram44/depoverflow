@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "depoverflow"
-version = "0.1.0"
+version = "0.1.1"
 description = "Watches StackOverflow answers and GitHub issues referenced in code for changes"
 
 license = "MIT"
